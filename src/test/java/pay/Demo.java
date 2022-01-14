@@ -1,4 +1,4 @@
-package pay;
+/*package pay;
 
 import com.github.wxpay.sdk.MyConfig;
 import com.github.wxpay.sdk.WXPay;
@@ -7,12 +7,12 @@ import java.util.Map;
 
 public class Demo {
   public static void main(String[] args) throws Exception {
-    /**
+    *//**
      * url ：  /pay/unifiedorder    wxPay.unifiedOrder
      * 请求方式
      * 请求参数    requsetMap
      * 返回值      responseMap
-     */
+     *//*
     //微信支付的测试接口
     //1.创建一个微信支付核心对象
     MyConfig my = new MyConfig();
@@ -36,16 +36,16 @@ public class Demo {
     requsetMap.put("trade_type","NATIVE");
 
     //模拟浏览器发送一个http请求
-    /**
+    *//**
      * requsetMap 代表请求参数
      * responseMap  返回值
-     */
+     *//*
     Map<String, String> responseMap = wxPay.unifiedOrder(requsetMap);
 
     System.out.println(responseMap);
     //返回值中 code_url 就是支付二维码连接
 
-    /**
+    *//**
      * return_msg  代表成功
      * result_code SUCCESS
      * code_url   生成支付二维码  weixin://wxpay/bizpayurl?pr=23CaFbOzz, = 二维码
@@ -56,6 +56,6 @@ public class Demo {
      * sign=0BB8257245E8255C6D6176930516546398AB9A0F23A4F49D8D7B46078CF3B6EA,
      * trade_type=NATIVE, return_msg=OK, result_code=SUCCESS, mch_id=1473426802,
      * return_code=SUCCESS, prepay_id=wx10094200313158c49bc3946a2e6a7d0000}
-     */
+     *//*
   }
-}
+}*/

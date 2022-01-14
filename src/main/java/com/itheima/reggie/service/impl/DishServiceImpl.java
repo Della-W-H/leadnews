@@ -17,9 +17,11 @@ import com.itheima.reggie.service.DishService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +30,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DishServiceImpl implements DishService {
 
-  @Autowired
+  @Resource
   private DishMapper dishMapper;
-  @Autowired
+  @Resource
   private DishFlavorMapper dishFlavorMapper;
-  @Autowired
+  @Resource
   private CategoryMapper categoryMapper;
+  @Resource
+  private RedisTemplate redisTemplate;
 
   @Override
   public Result add(DishDto dishDto) {
@@ -137,6 +141,7 @@ public class DishServiceImpl implements DishService {
     for (Long id : ids) {
       dishFlavorMapper.deleteById(id);
     }
+    redisTemplate.delete("dish");
     return Result.success("删除成功");
   }
 
@@ -161,16 +166,25 @@ public class DishServiceImpl implements DishService {
 
   @Override
   public Result getListByCategoryId(Long categoryId) {
-    LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
-    dishLambdaQueryWrapper.eq(Dish::getCategoryId,categoryId);
-    List<Dish> dishes = dishMapper.selectList(dishLambdaQueryWrapper);
 
-    String jsonString = JSON.toJSONString(dishes);
-    List<DishDto> dishDtos = JSON.parseArray(jsonString, DishDto.class);
-    for (DishDto dishDto : dishDtos) {
-      List<DishFlavor> dishFlavors = dishFlavorMapper.selectList(
-          new LambdaQueryWrapper<DishFlavor>().eq(DishFlavor::getDishId, dishDto.getId()));
-      dishDto.setFlavors(dishFlavors);
+    List<DishDto> dishDtos = (List<DishDto>) redisTemplate.opsForHash().get("dish", categoryId);
+
+    if (dishDtos ==null||dishDtos.size() == 0) {
+      System.out.println("我是从数据库中查询的数据");
+      LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+      dishLambdaQueryWrapper.eq(Dish::getCategoryId, categoryId);
+      List<Dish> dishes = dishMapper.selectList(dishLambdaQueryWrapper);
+
+      String jsonString = JSON.toJSONString(dishes);
+      dishDtos = JSON.parseArray(jsonString, DishDto.class);
+      for (DishDto dishDto : dishDtos) {
+        List<DishFlavor> dishFlavors = dishFlavorMapper.selectList(
+            new LambdaQueryWrapper<DishFlavor>().eq(DishFlavor::getDishId, dishDto.getId()));
+        dishDto.setFlavors(dishFlavors);
+      }
+      redisTemplate.opsForHash().put("dish",categoryId,dishDtos);
+    } else {
+      System.out.println("我是从缓存中查询的数据！");
     }
     return Result.success(dishDtos);
   }

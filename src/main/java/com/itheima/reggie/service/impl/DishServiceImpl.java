@@ -57,7 +57,10 @@ public class DishServiceImpl implements DishService {
       flavor.setDishId(dish.getId());
       dishFlavorMapper.insert(flavor);
     }
+
+    redisTemplate.delete("dish");
     return Result.success("添加成功");
+
   }
 
   @Override
@@ -130,8 +133,8 @@ public class DishServiceImpl implements DishService {
       flavor.setDishId(dishDto.getId());
       dishFlavorMapper.insert(flavor);
     }
+    redisTemplate.delete("dish");
     return Result.success("修改成功");
-    ///
   }
 
   @Override
@@ -161,7 +164,7 @@ public class DishServiceImpl implements DishService {
     LambdaUpdateWrapper<Dish> wrapper = new LambdaUpdateWrapper<>();
     wrapper.set(Dish::getStatus,status).in(Dish::getId,ids);
     dishMapper.update(null,wrapper);
-
+    redisTemplate.delete("dish");
     return Result.success("修改成功");
   }
 

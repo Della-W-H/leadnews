@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.itheima.reggie.commons.RedisContant;
 import com.itheima.reggie.commons.Result;
 import com.itheima.reggie.entity.Category;
 import com.itheima.reggie.entity.Dish;
@@ -20,7 +21,6 @@ import java.util.List;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +58,7 @@ public class DishServiceImpl implements DishService {
       dishFlavorMapper.insert(flavor);
     }
 
-    redisTemplate.delete("dish");
+    redisTemplate.delete(RedisContant.DISH);
     return Result.success("添加成功");
 
   }
@@ -133,7 +133,7 @@ public class DishServiceImpl implements DishService {
       flavor.setDishId(dishDto.getId());
       dishFlavorMapper.insert(flavor);
     }
-    redisTemplate.delete("dish");
+    redisTemplate.delete(RedisContant.DISH);
     return Result.success("修改成功");
   }
 
@@ -145,7 +145,7 @@ public class DishServiceImpl implements DishService {
     for (Long id : ids) {
       dishFlavorMapper.deleteById(id);
     }
-    redisTemplate.delete("dish");
+    redisTemplate.delete(RedisContant.DISH);
     return Result.success("删除成功");
   }
 
@@ -164,14 +164,14 @@ public class DishServiceImpl implements DishService {
     LambdaUpdateWrapper<Dish> wrapper = new LambdaUpdateWrapper<>();
     wrapper.set(Dish::getStatus,status).in(Dish::getId,ids);
     dishMapper.update(null,wrapper);
-    redisTemplate.delete("dish");
+    redisTemplate.delete(RedisContant.DISH);
     return Result.success("修改成功");
   }
 
   @Override
   public Result getListByCategoryId(Long categoryId) {
 
-    List<DishDto> dishDtos = (List<DishDto>) redisTemplate.opsForHash().get("dish", categoryId);
+    List<DishDto> dishDtos = (List<DishDto>) redisTemplate.opsForHash().get(RedisContant.DISH, RedisContant.CATEGORYDISH+categoryId);
 
     if (dishDtos ==null||dishDtos.size() == 0) {
       System.out.println("我是从数据库中查询的数据");
@@ -186,7 +186,7 @@ public class DishServiceImpl implements DishService {
             new LambdaQueryWrapper<DishFlavor>().eq(DishFlavor::getDishId, dishDto.getId()));
         dishDto.setFlavors(dishFlavors);
       }
-      redisTemplate.opsForHash().put("dish",categoryId,dishDtos);
+      redisTemplate.opsForHash().put(RedisContant.DISH,RedisContant.CATEGORYDISH+categoryId,dishDtos);
     } else {
       System.out.println("我是从缓存中查询的数据！");
     }

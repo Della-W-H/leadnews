@@ -22,6 +22,9 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +41,7 @@ public class SetmealServiceImpl implements SetmealService {
   private DishMapper dishMapper;
 
   @Override
+  @CacheEvict(value = "setmeal",allEntries = true)
   public Result add(SetmealDto setmealDto) {
     Setmeal setmeal = new Setmeal();
     BeanUtils.copyProperties(setmealDto,setmeal);
@@ -52,6 +56,7 @@ public class SetmealServiceImpl implements SetmealService {
   }
 
   @Override
+  @Cacheable(value = "setmeal",key = "#root.args[0]+'_'+#root.args[1]")
   public Result page(Integer page, Integer pageSize, String name) {
     IPage<Setmeal> setPage = new Page<>(page,pageSize);
 
@@ -81,6 +86,7 @@ public class SetmealServiceImpl implements SetmealService {
   }
 
   @Override
+  @CacheEvict(value = "setmeal",allEntries = true)
   public Result deleteByIds(Long[] ids) {
     setmealMapper.deleteBatchIds(Arrays.asList(ids));
     LambdaUpdateWrapper<SetmealDish> wrapper = new LambdaUpdateWrapper<>();
@@ -90,6 +96,7 @@ public class SetmealServiceImpl implements SetmealService {
   }
 
   @Override
+  @Cacheable(value = "setmeal",key = "#root.args[0]")
   public Result getById(Long id) {
     SetmealDto setmealDto = new SetmealDto();
     Setmeal setmeal = setmealMapper.selectById(id);
@@ -102,6 +109,7 @@ public class SetmealServiceImpl implements SetmealService {
   }
 
   @Override
+  @CacheEvict(value = "setmeal", allEntries = true)
   public Result update(SetmealDto setmealDto) {
 
     setmealMapper.updateById(setmealDto);
@@ -116,6 +124,7 @@ public class SetmealServiceImpl implements SetmealService {
     return Result.success("修改成功");
   }
 
+  @CacheEvict(value = "setmeal", allEntries = true)
   @Override
   public Result changeStatus(Long[] ids, Integer changeStatus) {
     LambdaUpdateWrapper<Setmeal> wrapper = new LambdaUpdateWrapper<>();
@@ -124,6 +133,7 @@ public class SetmealServiceImpl implements SetmealService {
     return Result.success("修改成功");
   }
 
+  @Cacheable(value = "setmeal", key = "#root.args[0]+'_'+#root.args[1]")
   @Override
   public Result findAll(Long categoryId, Integer status) {
     List<Dish> dishes = dishMapper

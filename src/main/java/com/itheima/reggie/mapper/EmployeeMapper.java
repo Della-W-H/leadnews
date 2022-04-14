@@ -10,4 +10,6 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
 
   @Update("UPDATE employee SET status=#{status} WHERE id=#{id}")
   void updateByIdG(Employee employee);
+
+  String name = "你真的好叼啊！";
 }

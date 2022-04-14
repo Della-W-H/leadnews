@@ -31,6 +31,7 @@ public class JacksonObjectMapper extends ObjectMapper {
     public JacksonObjectMapper() {
         super();
         //收到未知属性时不报异常
+       //yichang
         this.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         //反序列化时，属性不存在的兼容处理

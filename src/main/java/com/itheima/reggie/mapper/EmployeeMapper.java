@@ -12,4 +12,6 @@ public interface EmployeeMapper extends BaseMapper<Employee> {
   void updateByIdG(Employee employee);
 
   String name = "你真的好叼啊！";
+
+  String gender = "我不知道你的名字啊";
 }

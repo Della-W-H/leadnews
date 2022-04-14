@@ -8,6 +8,6 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface EmployeeMapper extends BaseMapper<Employee> {
 
-/*  @Update("UPDATE employee SET status=#{status} WHERE id=#{id}")
-  void updateByIdG(Employee employee);*/
+  @Update("UPDATE employee SET status=#{status} WHERE id=#{id}")
+  void updateByIdG(Employee employee);
 }

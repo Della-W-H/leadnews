@@ -22,6 +22,7 @@ class c {
     for (int i = 0; i < 10; i++) {
       repeat(i,()-> System.out.println("countdown"));
       speak(i,()->log.info("你真的很牛逼哦"));
+      System.out.println("dad");
     }
   }
 
